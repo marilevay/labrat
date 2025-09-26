@@ -15,7 +15,7 @@
   },
   "content_scripts": [{
     "matches": ["*://*.snowflakecomputing.com/*"],
-    "js": ["content.js"]
+    "js": ["assistant.js"]
   }],
   "action": {
     "default_title": "Open LabRat Assistant"
