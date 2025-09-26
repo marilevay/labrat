@@ -13,8 +13,11 @@
   "side_panel": {
     "default_path": "main.html"
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [{
-    "matches": ["https://app.snowflake.com/*"],
+    "matches": ["*://*.snowflakecomputing.com/*", "*://app.snowflake.com/*"],
     "js": ["assistant.js"]
   }],
   "action": {
