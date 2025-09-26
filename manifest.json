@@ -7,14 +7,17 @@
     "storage",
     "sidePanel"
   ],
+  "host_permissions": [
+    "http://localhost:8000/*"
+  ],
   "side_panel": {
-    "default_path": "sidepanel.html"
+    "default_path": "main.html"
   },
   "content_scripts": [{
     "matches": ["*://*.snowflakecomputing.com/*"],
     "js": ["content.js"]
   }],
   "action": {
-    "default_title": "Open LabRat Drawing Panel"
+    "default_title": "Open LabRat Assistant"
   }
 }

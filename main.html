@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>LabRat Assistant</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="labrat-container">
+    <div class="header">
+      <h2>LabRat Assistant</h2>
+      <div class="mode-toggle">
+        <button id="draw-mode" class="active">Draw</button>
+        <button id="upload-mode">Upload Notes</button>
+      </div>
+    </div>
+
+    <!-- Drawing Canvas -->
+    <div id="drawing-section" class="section active">
+      <canvas id="drawing-canvas" width="400" height="600"></canvas>
+      <div class="canvas-controls">
+        <button id="clear-canvas">Clear</button>
+        <button id="process-drawing">🔬 Convert to Code</button>
+      </div>
+    </div>
+
+    <!-- File Upload -->
+    <div id="upload-section" class="section">
+      <div class="upload-zone" id="upload-zone">
+        <p>Drop handwritten notes here or click to upload</p>
+        <input type="file" id="file-input" accept="image/*" multiple>
+      </div>
+      <button id="process-upload">📝 Extract & Convert</button>
+    </div>
+
+    <!-- Results -->
+    <div id="results-section">
+      <h3>Generated Code</h3>
+      <pre id="generated-code"></pre>
+      <button id="insert-to-snowflake">Insert into Snowflake</button>
+      
+      <h3>Mathematical Equations</h3>
+      <div id="equations"></div>
+      
+      <button id="generate-report">📄 Generate Lab Report</button>
+    </div>
+  </div>
+  <script src="sidepanel.js"></script>
+</body>
+</html>
