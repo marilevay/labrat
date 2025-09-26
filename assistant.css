@@ -1,0 +1,224 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f5f5f5;
+  width: 400px;
+  height: 100vh;
+}
+
+.labrat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 16px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 16px;
+}
+
+.header h2 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 20px;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.mode-toggle button {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-toggle button.active {
+  background: #007acc;
+  color: white;
+  border-color: #007acc;
+}
+
+.mode-toggle button:hover {
+  background: #f0f0f0;
+}
+
+.mode-toggle button.active:hover {
+  background: #005c99;
+}
+
+.section {
+  display: none;
+  flex: 1;
+}
+
+.section.active {
+  display: block;
+}
+
+/* Drawing Section */
+#drawing-canvas {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: crosshair;
+  width: 100%;
+  max-width: 100%;
+  height: 300px;
+}
+
+.canvas-controls {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* Upload Section */
+.upload-zone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.upload-zone:hover {
+  border-color: #007acc;
+}
+
+.upload-zone p {
+  margin: 0;
+  color: #666;
+}
+
+#file-input {
+  display: none;
+}
+
+/* Buttons */
+button {
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background: #f0f0f0;
+}
+
+button:active {
+  background: #e0e0e0;
+}
+
+#process-drawing, #process-upload {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+  margin-top: 12px;
+  width: 100%;
+}
+
+#process-drawing:hover, #process-upload:hover {
+  background: #218838;
+}
+
+/* Results Section */
+#results-section {
+  margin-top: 20px;
+  display: none;
+}
+
+#results-section h3 {
+  margin: 16px 0 8px 0;
+  color: #333;
+  font-size: 16px;
+}
+
+#generated-code {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#equations {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px;
+  min-height: 60px;
+}
+
+#insert-to-snowflake {
+  background: #17a2b8;
+  color: white;
+  border-color: #17a2b8;
+  margin-top: 8px;
+  width: 100%;
+}
+
+#insert-to-snowflake:hover {
+  background: #138496;
+}
+
+#generate-report {
+  background: #6f42c1;
+  color: white;
+  border-color: #6f42c1;
+  margin-top: 12px;
+  width: 100%;
+}
+
+#generate-report:hover {
+  background: #5a32a3;
+}
+
+#clear-canvas {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+#clear-canvas:hover {
+  background: #c82333;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}

@@ -14,7 +14,7 @@
     "default_path": "main.html"
   },
   "content_scripts": [{
-    "matches": ["*://*.snowflakecomputing.com/*"],
+    "matches": ["https://app.snowflake.com/*"],
     "js": ["assistant.js"]
   }],
   "action": {
