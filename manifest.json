@@ -19,8 +19,12 @@
     "service_worker": "background.js"
   },
   "content_scripts": [{
-    "matches": ["*://*.snowflakecomputing.com/*", "*://app.snowflake.com/*"],
-    "js": ["assistant.js"]
+    "matches": [
+      "*://*.snowflakecomputing.com/*", 
+      "*://app.snowflake.com/*"
+    ],
+    "js": ["snowflake-injector.js"],
+    "run_at": "document_end"
   }],
   "action": {
     "default_title": "Open LabRat Assistant"

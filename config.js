@@ -3,7 +3,7 @@ const CONFIG = {
   BACKEND: {
     URL: 'http://localhost:8000',
     ENDPOINTS: {
-      EDUCATE: '/api/educate',
+      LABRAT: '/api/labrat',
       HEALTH: '/api/health'
     }
   },

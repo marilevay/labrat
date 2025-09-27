@@ -9,10 +9,10 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
 });
 
-// Optional: Auto-enable side panel on Snowflake pages
+// Auto-enable side panel on Snowflake pages
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
-    // Check if we're on a Snowflake page
+    // Check if I'm on a Snowflake page
     if (tab.url.includes('snowflake.com') || tab.url.includes('snowflakecomputing.com')) {
       try {
         // Enable side panel for this tab
@@ -29,7 +29,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   }
 });
 
-// Optional: Set up context menu for easy access
+// Set up context menu for easy access
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'openLabRat',
@@ -46,6 +46,18 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       console.error('Error opening side panel from context menu:', error);
     }
   }
+});
+
+// Listen for messages from content scripts
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'CONTENT_SCRIPT_READY') {
+    console.log('LabRat content script ready on:', message.url);
+    // Store that this tab has an active content script
+    if (sender.tab) {
+      console.log('Content script loaded in tab:', sender.tab.id);
+    }
+  }
+  return false;
 });
 
 // Handle messages from content script or popup

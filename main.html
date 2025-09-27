@@ -11,16 +11,19 @@
       <h2>LabRat Assistant</h2>
       <div class="mode-toggle">
         <button id="draw-mode" class="active">Draw</button>
-        <button id="upload-mode">Upload Notes</button>
+        <button id="upload-mode">Upload</button>
+        <button id="chat-mode">Chat</button>
       </div>
     </div>
 
     <!-- Drawing Canvas -->
-    <div id="drawing-section" class="section active">
-      <canvas id="drawing-canvas" width="400" height="600"></canvas>
+    <div id="draw-section" class="section active">
+      <div class="canvas-wrapper">
+        <canvas id="drawing-canvas"></canvas>
+      </div>
       <div class="canvas-controls">
         <button id="clear-canvas">Clear</button>
-        <button id="process-drawing">🔬 Convert to Code</button>
+        <button id="process-drawing">Analyze Drawing</button>
       </div>
     </div>
 
@@ -28,21 +31,40 @@
     <div id="upload-section" class="section">
       <div class="upload-zone" id="upload-zone">
         <p>Drop handwritten notes here or click to upload</p>
-        <input type="file" id="file-input" accept="image/*" multiple>
+        <input type="file" id="file-input" accept="image/*,.pdf,.docx,.txt" multiple>
       </div>
       <button id="process-upload">Extract & Convert</button>
     </div>
 
+    <!-- Chat Interface -->
+    <div id="chat-section" class="section">
+      <div class="chat-container">
+        <div id="chat-messages" class="chat-messages">
+          <div class="message bot-message">
+            <div class="message-content">
+             Ask me anything about equations, data analysis, or converting handwritten notes to code!
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <textarea id="chat-input" placeholder="Ask me about math, equations, or data analysis..." rows="2"></textarea>
+          <button id="send-message">Send</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Results -->
-    <div id="results-section">
-      <h3>Generated Code</h3>
-      <pre id="generated-code"></pre>
-      <button id="insert-to-snowflake">Insert into Snowflake</button>
+    <div id="results-section" class="results-container">
+      <div class="result-item">
+        <h3>Generated Code</h3>
+        <pre id="generated-code"></pre>
+        <button id="insert-to-snowflake">Insert into Snowflake</button>
+      </div>
       
-      <h3>Mathematical Equations</h3>
-      <div id="equations"></div>
-      
-      <button id="generate-report">Generate Lab Report</button>
+      <div class="result-item">
+        <h3>Mathematical Equations</h3>
+        <div id="equations"></div>
+      </div>
     </div>
   </div>
   <script src="assistant.js"></script>
