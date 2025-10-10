@@ -61,6 +61,7 @@ class LabRatAssistant {
     const processDrawingBtn = document.getElementById('process-drawing');
     const processUploadBtn = document.getElementById('process-upload');
     const insertToSnowflakeBtn = document.getElementById('insert-to-snowflake');
+    const testInjectionBtn = document.getElementById('test-injection');
     const clearCanvasBtn = document.getElementById('clear-canvas');
 
     if (processDrawingBtn) processDrawingBtn.addEventListener('click', () => this.processDrawing());
@@ -69,7 +70,15 @@ class LabRatAssistant {
       this.processUpload();
     });
     if (insertToSnowflakeBtn) insertToSnowflakeBtn.addEventListener('click', () => this.insertToSnowflake());
+    if (testInjectionBtn) testInjectionBtn.addEventListener('click', () => this.testInjection());
     if (clearCanvasBtn) clearCanvasBtn.addEventListener('click', () => this.clearCanvas());
+
+    // Header injection controls
+    const headerInsertBtn = document.getElementById('header-insert-snowflake');
+    const headerTestBtn = document.getElementById('header-test-injection');
+
+    if (headerInsertBtn) headerInsertBtn.addEventListener('click', () => this.insertToSnowflake());
+    if (headerTestBtn) headerTestBtn.addEventListener('click', () => this.testInjectionFromHeader());
   }
 
   switchMode(mode) {
@@ -1227,6 +1236,98 @@ class LabRatAssistant {
         }
       });
     });
+  }
+
+  async testInjection() {
+    console.log('Testing Snowflake code injection...');
+    const statusElement = document.getElementById('injection-status');
+    
+    // Show loading status
+    if (statusElement) {
+      statusElement.textContent = 'Preparing test code...';
+      statusElement.className = 'status-message info';
+    }
+    
+    try {
+      // Get test code from backend
+      const response = await fetch(`${this.apiUrl}/api/test-injection`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (result.success && result.code) {
+        if (statusElement) {
+          statusElement.textContent = 'Test code ready! Attempting injection...';
+          statusElement.className = 'status-message info';
+        }
+        
+        // Use the existing insertToSnowflake method with the test code
+        await this.insertToSnowflake(result.code);
+        
+        if (statusElement) {
+          statusElement.textContent = '✅ Test injection completed! Check your Snowflake notebook.';
+          statusElement.className = 'status-message success';
+        }
+      } else {
+        throw new Error(result.error || 'Failed to get test code');
+      }
+    } catch (error) {
+      console.error('Test injection failed:', error);
+      if (statusElement) {
+        statusElement.textContent = `❌ Test injection failed: ${error.message}`;
+        statusElement.className = 'status-message error';
+      }
+    }
+  }
+
+  async testInjectionFromHeader() {
+    console.log('Testing Snowflake code injection from header...');
+    const statusElement = document.getElementById('header-injection-status');
+    
+    // Show loading status
+    if (statusElement) {
+      statusElement.textContent = 'Preparing test code...';
+      statusElement.className = 'status-message info';
+    }
+    
+    try {
+      // Get test code from backend
+      const response = await fetch(`${this.apiUrl}/api/test-injection`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (result.success && result.code) {
+        if (statusElement) {
+          statusElement.textContent = 'Test code ready! Attempting injection...';
+          statusElement.className = 'status-message info';
+        }
+        
+        // Use the existing insertToSnowflake method with the test code
+        await this.insertToSnowflake(result.code);
+        
+        if (statusElement) {
+          statusElement.textContent = '✅ Test injection completed!';
+          statusElement.className = 'status-message success';
+        }
+      } else {
+        throw new Error(result.error || 'Failed to get test code');
+      }
+    } catch (error) {
+      console.error('Test injection failed:', error);
+      if (statusElement) {
+        statusElement.textContent = `❌ Test injection failed: ${error.message}`;
+        statusElement.className = 'status-message error';
+      }
+    }
   }
 
   // Helper method to show messages in the side panel

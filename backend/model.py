@@ -6,14 +6,28 @@ from datetime import datetime
 import base64
 import io
 from PIL import Image
+import requests
+import os
 
-# Create a Bedrock Runtime client in the AWS Region you want to use.
+# Load environment variables from .env file
+def load_env_file():
+    """Load environment variables from .env file"""
+    env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+    if os.path.exists(env_path):
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip().strip('"\'')
+
+# Load .env file
+load_env_file()
+
 client = boto3.client("bedrock-runtime", region_name="us-west-2")
 
-# Set the model ID, e.g., Claude 3 Haiku.
 model_id = "us.anthropic.claude-opus-4-20250514-v1:0"
 
-# Configure logging for reasoning output
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -819,4 +833,191 @@ def analyze_with_landingai(image_base64):
         
     except Exception as e:
         return {"error": f"LandingAI analysis failed: {str(e)}"}
+
+def call_writer_vision(prompt, image_data=None):
+    """Call WRITER's vision API for image analysis and code generation"""
+    
+    try:
+        # Get WRITER API key from environment
+        writer_api_key = os.getenv('WRITER_API_KEY')
+        if not writer_api_key:
+            return {"error": "WRITER_API_KEY environment variable not set"}
+        
+        # WRITER API endpoint
+        writer_url = "https://api.writer.com/v1/chat/completions"
+        
+        headers = {
+            "Authorization": f"Bearer {writer_api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        # Prepare the message content
+        messages = []
+        content = [{"type": "text", "text": prompt}]
+        
+        # Add image if provided
+        if image_data:
+            # Handle image format and base64 conversion
+            if image_data.startswith('data:image'):
+                # Extract format and data
+                header, base64_data = image_data.split(',', 1)
+                if '/jpeg' in header or '/jpg' in header:
+                    image_format = "jpeg"
+                elif '/png' in header:
+                    image_format = "png"
+                elif '/webp' in header:
+                    image_format = "webp"
+                else:
+                    image_format = "png"  # default
+                
+                # WRITER expects the full data URL format
+                content.append({
+                    "type": "image_url",
+                    "image_url": {
+                        "url": image_data
+                    }
+                })
+            else:
+                # If no data URL prefix, add it (assume PNG)
+                content.append({
+                    "type": "image_url", 
+                    "image_url": {
+                        "url": f"data:image/png;base64,{image_data}"
+                    }
+                })
+        
+        messages.append({
+            "role": "user",
+            "content": content
+        })
+        
+        # Make request to WRITER API
+        payload = {
+            "model": "palmyra-vision",  # WRITER's vision model
+            "messages": messages,
+            "max_tokens": 1000,
+            "temperature": 0.1,
+            "top_p": 0.9
+        }
+        
+        response = requests.post(writer_url, headers=headers, json=payload, timeout=30)
+        
+        if response.status_code == 200:
+            result = response.json()
+            response_text = result["choices"][0]["message"]["content"]
+            return {
+                "success": True,
+                "text": response_text,
+                "model": "palmyra-vision",
+                "provider": "writer"
+            }
+        else:
+            error_msg = f"WRITER API error {response.status_code}: {response.text}"
+            return {"error": error_msg}
+            
+    except requests.exceptions.RequestException as e:
+        return {"error": f"WRITER API request failed: {str(e)}"}
+    except Exception as e:
+        return {"error": f"WRITER vision analysis failed: {str(e)}"}
+
+def analyze_with_writer_vision(image_data, include_reasoning=True, verbose=True):
+    """Analyze drawing using WRITER's vision model with educational focus"""
+    
+    if not image_data:
+        return {"error": "No image data provided"}
+    
+    if verbose:
+        print("Analyzing drawing with WRITER Vision...")
+    
+    # Educational prompt for WRITER
+    educational_prompt = """You are an educational assistant for university students working on mathematical modeling and data analysis projects.
+
+Please analyze this image which may contain handwritten notes, mathematical equations, diagrams, or research content, and provide code cell suggestions for a Jupyter notebook.
+
+Your analysis should include:
+
+## VISUAL ANALYSIS
+Describe what you observe in the image:
+- Mathematical equations, formulas, or expressions
+- Graphs, charts, or data visualizations  
+- Variables, parameters, and their relationships
+- Any data patterns or trends shown
+
+## EDUCATIONAL GUIDANCE
+As a tutor, provide step-by-step guidance:
+1. What mathematical concepts are illustrated?
+2. What variables and relationships can you identify?
+3. How could this be translated into computational code?
+4. What educational value does this have for students?
+
+## CODE CELL SUGGESTIONS
+Provide 2-3 Python code cells that students could use in a Jupyter notebook:
+
+```python
+# Cell 1: Setup and data preparation
+# [Include actual code]
+```
+
+```python
+# Cell 2: Main analysis or computation
+# [Include actual code]
+```
+
+```python
+# Cell 3: Visualization or results
+# [Include actual code]
+```
+
+## TODO STEPS FOR STUDENTS
+List 3-5 actionable next steps for students to:
+- Understand the concepts better
+- Implement the code successfully
+- Extend the analysis further
+- Connect to real-world applications
+
+Focus on creating educational, step-by-step guidance that helps students learn through doing."""
+    
+    try:
+        # Call WRITER Vision API
+        response = call_writer_vision(educational_prompt, image_data)
+        
+        if response.get("success"):
+            response_text = response["text"]
+            
+            if verbose:
+                print("✓ WRITER Vision analysis complete!")
+                if include_reasoning:
+                    print("\n" + "="*60)
+                    print("WRITER'S ANALYSIS:")
+                    print("="*60)
+                    print(response_text)
+                    print("="*60 + "\n")
+            
+            # Extract code cells from the response
+            notebook_cells = extract_code_cells_from_response(response_text)
+            
+            # Extract feasibility score if present
+            feasibility_score = extract_score_from_text(response_text, "feasibility")
+            
+            return {
+                "success": True,
+                "text": response_text,
+                "model": "palmyra-vision",
+                "provider": "writer",
+                "notebook_cells": notebook_cells,
+                "reasoning_included": include_reasoning,
+                "feasibility_score": feasibility_score,
+                "analysis_type": "writer_vision_educational"
+            }
+        else:
+            error_msg = response.get("error", "Unknown WRITER error")
+            if verbose:
+                print(f"✗ WRITER Vision analysis failed: {error_msg}")
+            return {"error": error_msg}
+            
+    except Exception as e:
+        error_msg = f"WRITER vision analysis failed: {str(e)}"
+        if verbose:
+            print(f"✗ Error: {error_msg}")
+        return {"error": error_msg}
             

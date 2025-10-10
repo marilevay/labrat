@@ -13,7 +13,7 @@ app = Flask(__name__)
 CORS(app)  # Allow requests from your Chrome extension
 
 # Import your educational model
-from model import call_model, process_whiteboard_to_code, analyze_experiment_data, guide_simulation_building, extract_math_from_drawing, create_snowflake_notebook, analyze_with_landingai, analyze_drawing_with_reasoning, print_analysis_header, log_reasoning_step
+from model import call_model, process_whiteboard_to_code, analyze_experiment_data, guide_simulation_building, extract_math_from_drawing, create_snowflake_notebook, analyze_with_landingai, analyze_drawing_with_reasoning, analyze_with_writer_vision, print_analysis_header, log_reasoning_step
 
 @app.route('/api/labrat', methods=['POST'])
 def labrat():
@@ -40,8 +40,13 @@ def labrat():
             # Choose vision model based on request
             if vision_model == 'landingai':
                 result = analyze_with_landingai(image_data)
+            elif vision_model == 'writer':
+                # Use WRITER's vision model
+                include_reasoning = data.get('include_reasoning', True)
+                verbose = data.get('verbose', True)
+                result = analyze_with_writer_vision(image_data, include_reasoning, verbose)
             else:
-                # Include reasoning by default, allow override
+                # Default to Claude Bedrock
                 include_reasoning = data.get('include_reasoning', True)
                 verbose = data.get('verbose', True)
                 result = extract_math_from_drawing(image_data, include_reasoning, verbose)
@@ -181,6 +186,48 @@ def create_notebook():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/test-injection', methods=['POST'])
+def test_injection():
+    """Test endpoint for Snowflake code injection functionality"""
+    try:
+        # Sample Python code to inject for testing
+        test_code = """import math
+
+        # --- Physics setup ---
+        g = 9.8           # gravity (m/s^2)
+        L = 1.0           # length of pendulum (m)
+        theta = math.radians(20)  # initial angle (20 degrees)
+        omega = 0.0       # angular velocity (rad/s)
+        dt = 0.1          # time step (s)
+
+        # --- Simulation loop ---
+        for t in range(30):  # 30 steps
+            # Equation of motion (small angle): θ'' = -(g/L) * θ
+            alpha = -(g/L) * theta     # angular acceleration
+            omega += alpha * dt        # update angular velocity
+            theta += omega * dt        # update angle
+            
+            # Convert angle to degrees for easier understanding
+            print(f"Time={t*dt:.1f}s | Angle={math.degrees(theta):.2f}° | Angular velocity={omega:.2f} rad/s")
+
+        # --- TODOs for you ---
+        # 1. Change L (length) and see how oscillation speed changes.
+        # 2. Change the initial angle (theta) and observe motion.
+        # 3. Try smaller dt (e.g. 0.01) for smoother results.
+        # 4. Extend: add damping (like air resistance): alpha = -(g/L)*theta - b*omega
+        """
+        
+        return jsonify({
+            "success": True,
+            "code": test_code,
+            "message": "Test code ready for injection",
+            "timestamp": "2025-09-26",
+            "status": "ready"
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e), "success": False}), 500
 
 @app.route('/api/health', methods=['GET'])
 def health():
