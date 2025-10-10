@@ -2,7 +2,7 @@
 
 ## Video Demo
 
-[Watch it!](https://drive.google.com/file/d/1XOn9YIvdRdCLEq4oEqVGs8r_ghWkrDdy/view?usp=sharing)
+[Watch it!](https://drive.google.com/file/d/1XOn9YIvdRdCLEq4oEqVGs8r_ghWkrDdy/view?usp=sharing) (inclined plane example)
 
 Developed as a solo hack project during the 1st Silicon Valley AI Hub ([SVAI HUb](https://siliconvalleyaihub.com/)) Hackathon hosted by Snowflake, Meta and AWS. (Top 6 projects)
 
